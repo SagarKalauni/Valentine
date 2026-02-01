@@ -71,6 +71,7 @@
         #no-button {
             transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             z-index: 50;
+            position: relative;
         }
 
         #yes-button {
@@ -230,8 +231,11 @@
             const comment = document.createElement('div');
             comment.className = 'funny-comment';
             comment.innerText = comments[Math.floor(Math.random() * comments.length)];
-            comment.style.left = x + 'px';
-            comment.style.top = y + 'px';
+            
+            // Adjust spawn position slightly to be visible
+            comment.style.left = Math.min(window.innerWidth - 100, Math.max(10, x)) + 'px';
+            comment.style.top = Math.min(window.innerHeight - 50, Math.max(10, y)) + 'px';
+            
             document.body.appendChild(comment);
             setTimeout(() => comment.remove(), 1000);
         }
@@ -244,13 +248,14 @@
             const buttonWidth = noBtn.offsetWidth;
             const buttonHeight = noBtn.offsetHeight;
 
-            // Safe screen bounds calculation
-            const padding = 40;
-            const maxX = window.innerWidth - buttonWidth - padding;
-            const maxY = window.innerHeight - buttonHeight - padding;
+            // Constrain the button to stay within a 15% margin from screen edges
+            const marginX = window.innerWidth * 0.15;
+            const marginY = window.innerHeight * 0.15;
+            const maxX = window.innerWidth - buttonWidth - marginX;
+            const maxY = window.innerHeight - buttonHeight - marginY;
             
-            const randomX = Math.max(padding, Math.random() * maxX);
-            const randomY = Math.max(padding, Math.random() * maxY);
+            const randomX = Math.max(marginX, Math.random() * maxX);
+            const randomY = Math.max(marginY, Math.random() * maxY);
             
             spawnComment(noBtn.offsetLeft, noBtn.offsetTop);
 
