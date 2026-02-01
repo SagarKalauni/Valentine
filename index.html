@@ -69,7 +69,9 @@
         }
 
         #no-button {
-            transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+            /* Making the runaway movement very smooth */
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative; /* Starts relative, turns fixed on first hover */
         }
 
         #yes-button {
@@ -103,12 +105,12 @@
             
             <p class="text-slate-500 mb-10 font-medium text-lg">I've been waiting to ask you this for a while...</p>
 
-            <div class="flex flex-col sm:flex-row items-center justify-center gap-4 min-h-[100px]">
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-4 min-h-[100px] relative">
                 <button id="yes-button" class="bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 text-white px-12 py-4 rounded-2xl text-2xl font-bold shadow-[0_10px_20px_rgba(239,68,68,0.3)] transition-all active:scale-95 flex items-center gap-3 z-20 group">
                     YES! <i data-lucide="heart" class="fill-white group-hover:scale-125 transition-transform w-6 h-6"></i>
                 </button>
 
-                <button id="no-button" class="bg-slate-100 text-slate-400 px-8 py-4 rounded-2xl text-xl font-bold border border-slate-200 hover:bg-white hover:text-slate-600 hover:shadow-lg transition-all duration-150 whitespace-nowrap z-10">
+                <button id="no-button" class="bg-slate-100 text-slate-400 px-8 py-4 rounded-2xl text-xl font-bold border border-slate-200 hover:bg-white hover:text-slate-600 hover:shadow-lg whitespace-nowrap z-10">
                     No
                 </button>
             </div>
@@ -186,13 +188,24 @@
 
         // --- Move Button Logic ---
         function moveButton() {
-            const padding = 100;
-            const x = Math.random() * (window.innerWidth - padding * 2) + padding;
-            const y = Math.random() * (window.innerHeight - padding * 2) + padding;
+            // First time it's moved, we set it to fixed to ensure it can go anywhere
+            if (noBtn.style.position !== 'fixed') {
+                noBtn.style.position = 'fixed';
+            }
+
+            const buttonWidth = noBtn.offsetWidth;
+            const buttonHeight = noBtn.offsetHeight;
+
+            // Random coordinates within the viewport, with safety padding
+            const padding = 50;
+            const maxX = window.innerWidth - buttonWidth - padding;
+            const maxY = window.innerHeight - buttonHeight - padding;
             
-            noBtn.style.position = 'fixed';
-            noBtn.style.left = `${x}px`;
-            noBtn.style.top = `${y}px`;
+            const randomX = Math.random() * (maxX - padding) + padding;
+            const randomY = Math.random() * (maxY - padding) + padding;
+            
+            noBtn.style.left = `${randomX}px`;
+            noBtn.style.top = `${randomY}px`;
             
             // Update Text
             noCount = (noCount + 1) % noMessages.length;
@@ -203,9 +216,9 @@
             yesBtn.style.transform = `scale(${yesButtonSize})`;
         }
 
-        noBtn.addEventListener('mouseenter', moveButton);
-        noBtn.addEventListener('touchstart', (e) => {
-            e.preventDefault();
+        noBtn.addEventListener('mouseover', moveButton);
+        noBtn.addEventListener('click', (e) => {
+            // In case they manage to click it (touch screen usually)
             moveButton();
         });
 
